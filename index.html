@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZayinUp LLP - Your Recruitment Partner</title>
+  <link rel="icon" type="image/png"
+    href="https://raw.githubusercontent.com/abhiraj6/icon/refs/heads/main/Copy%20of%201771699124529.png">
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#003366',    // Navy
+            accent: '#0073b1',     // LinkedIn Blue
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+  <!-- React Router DOM (v6) needs these specific scripts in UMD -->
+  <script src="https://unpkg.com/@remix-run/router@1.21.0/dist/router.umd.min.js"></script>
+  <script src="https://unpkg.com/react-router@6.28.0/dist/umd/react-router.development.js"></script>
+  <script src="https://unpkg.com/react-router-dom@6.28.0/dist/umd/react-router-dom.development.js"></script>
+
+  <!-- Babel for in-browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* Prevent FOUC before React loads */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+    }
+
+    #root:empty::before {
+      content: "Loading ZayinUp...";
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Inter', sans-serif;
+      color: #003366;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+
+<body class="text-gray-900 font-sans antialiased min-h-screen flex flex-col">
+  <div id="root" class="flex-grow flex flex-col"></div>
+
+  <!-- Application Scripts in correct dependency order -->
+  <script type="text/babel" src="src/services.js"></script>
+  <script type="text/babel" src="src/components.js"></script>
+  <script type="text/babel" src="src/pages/Home.js"></script>
+  <script type="text/babel" src="src/pages/Openings.js"></script>
+  <script type="text/babel" src="src/pages/Services.js"></script>
+  <script type="text/babel" src="src/pages/Admission.js"></script>
+  <script type="text/babel" src="src/pages/Contact.js"></script>
+  <script type="text/babel" src="src/pages/Register.js"></script>
+  <script type="text/babel" src="src/pages/Admin.js"></script>
+  <script type="text/babel" src="src/App.js"></script>
+</body>
+
+</html>
