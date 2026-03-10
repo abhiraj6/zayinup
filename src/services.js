@@ -1,4 +1,43 @@
 // We use window to share state and methods across Babel standalone scripts
+window.SYNC_URL = ""; // PASTE YOUR GOOGLE WEB APP URL HERE
+
+window.syncService = {
+    sync: async (type, data) => {
+        if (!window.SYNC_URL) return;
+        try {
+            await fetch(window.SYNC_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'syncAll', type, data })
+            });
+        } catch (e) {
+            console.error("Sync failed:", e);
+        }
+    },
+    fetchAll: async () => {
+        if (!window.SYNC_URL) return null;
+        try {
+            const res = await fetch(`${window.SYNC_URL}?action=getAll`);
+            const data = await res.json();
+            return data;
+        } catch (e) {
+            console.error("Fetch failed:", e);
+            return null;
+        }
+    },
+    init: async (callback) => {
+        const cloudData = await window.syncService.fetchAll();
+        if (cloudData) {
+            if (cloudData.jobs) localStorage.setItem('zayin_jobs', JSON.stringify(cloudData.jobs));
+            if (cloudData.colleges) localStorage.setItem('zayin_colleges', JSON.stringify(cloudData.colleges));
+            if (cloudData.domains) localStorage.setItem('zayin_domains', JSON.stringify(cloudData.domains));
+            if (cloudData.purposes) localStorage.setItem('zayin_purposes', JSON.stringify(cloudData.purposes));
+            if (callback) callback();
+        }
+    }
+};
+
 window.initialJobs = [
     {
         id: 1,
@@ -89,12 +128,14 @@ window.jobService = {
         const newJob = { ...job, id: Date.now() };
         jobs.push(newJob);
         localStorage.setItem('zayin_jobs', JSON.stringify(jobs));
+        window.syncService.sync('Jobs', jobs);
         return newJob;
     },
     deleteJob: (id) => {
         let jobs = window.jobService.getJobs();
         jobs = jobs.filter(j => String(j.id) !== String(id));
         localStorage.setItem('zayin_jobs', JSON.stringify(jobs));
+        window.syncService.sync('Jobs', jobs);
     },
     updateJob: (updatedJob) => {
         let jobs = window.jobService.getJobs();
@@ -102,6 +143,7 @@ window.jobService = {
         if (index !== -1) {
             jobs[index] = updatedJob;
             localStorage.setItem('zayin_jobs', JSON.stringify(jobs));
+            window.syncService.sync('Jobs', jobs);
             return updatedJob;
         }
         return null;
@@ -130,12 +172,14 @@ window.collegeService = {
         };
         colleges.push(newCollege);
         localStorage.setItem('zayin_colleges', JSON.stringify(colleges));
+        window.syncService.sync('Colleges', colleges);
         return newCollege;
     },
     deleteCollege: (id) => {
         let colleges = window.collegeService.getColleges();
         colleges = colleges.filter(c => String(c.id) !== String(id));
         localStorage.setItem('zayin_colleges', JSON.stringify(colleges));
+        window.syncService.sync('Colleges', colleges);
     },
     updateCollege: (updatedCollege) => {
         let colleges = window.collegeService.getColleges();
@@ -148,6 +192,7 @@ window.collegeService = {
             const processedCollege = { ...updatedCollege, programs: programsArray };
             colleges[index] = processedCollege;
             localStorage.setItem('zayin_colleges', JSON.stringify(colleges));
+            window.syncService.sync('Colleges', colleges);
             return processedCollege;
         }
         return null;
@@ -250,6 +295,7 @@ window.optionsService = {
         if (!domains.includes(domain)) {
             domains.push(domain);
             localStorage.setItem('zayin_domains', JSON.stringify(domains));
+            window.syncService.sync('Domains', domains.map(d => ({name: d})));
         }
         return domains;
     },
@@ -257,6 +303,7 @@ window.optionsService = {
         let domains = window.optionsService.getDomains();
         domains = domains.filter(d => d !== domain);
         localStorage.setItem('zayin_domains', JSON.stringify(domains));
+        window.syncService.sync('Domains', domains.map(d => ({name: d})));
         return domains;
     },
     getPurposes: () => {
@@ -273,6 +320,7 @@ window.optionsService = {
         if (!purposes.includes(purpose)) {
             purposes.push(purpose);
             localStorage.setItem('zayin_purposes', JSON.stringify(purposes));
+            window.syncService.sync('Purposes', purposes.map(p => ({name: p})));
         }
         return purposes;
     },
@@ -280,6 +328,7 @@ window.optionsService = {
         let purposes = window.optionsService.getPurposes();
         purposes = purposes.filter(p => p !== purpose);
         localStorage.setItem('zayin_purposes', JSON.stringify(purposes));
+        window.syncService.sync('Purposes', purposes.map(p => ({name: p})));
         return purposes;
     }
 };
