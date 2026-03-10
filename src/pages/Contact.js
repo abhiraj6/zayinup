@@ -6,7 +6,8 @@ window.pages.Contact = () => {
         email: '',
         phone: '',
         domain: '',
-        purpose: ''
+        purpose: '',
+        message: ''
     });
 
     const [submitting, setSubmitting] = React.useState(false);
@@ -35,11 +36,11 @@ window.pages.Contact = () => {
         setSubmitted(true);
         setTimeout(() => {
             setSubmitted(false);
-            setFormData({ name: '', email: '', phone: '', domain: '', purpose: '' });
+            setFormData({ name: '', email: '', phone: '', domain: '', purpose: '', message: '' });
         }, 4000);
     };
 
-    const showPurpose = formData.domain === 'Job Seeker';
+    const showPurpose = formData.domain === 'Job seeker';
 
     return (
         <div className="py-20 bg-gray-50 flex-grow relative overflow-hidden">
@@ -129,7 +130,7 @@ window.pages.Contact = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">I am a...</label>
                                         <select required name="domain" value={formData.domain} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer appearance-none">
                                             <option value="" disabled>Select your domain</option>
-                                            <option value="Job Seeker">Job Seeker</option>
+                                            <option value="Job seeker">Job seeker</option>
                                             <option value="Company">Company</option>
                                         </select>
                                     </div>
@@ -145,6 +146,11 @@ window.pages.Contact = () => {
                                             </select>
                                         </div>
                                     )}
+
+                                    <div className="sm:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                        <textarea required name="message" value={formData.message} onChange={handleChange} rows="4" className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none" placeholder="Your message here..."></textarea>
+                                    </div>
                                 </div>
 
                                 <div className="pt-6 mt-6 border-t border-gray-100 flex justify-end">
