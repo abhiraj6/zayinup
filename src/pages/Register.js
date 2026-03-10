@@ -17,6 +17,7 @@ window.pages.Register = () => {
     });
 
     const [jobDetails, setJobDetails] = React.useState(null);
+    const [submitting, setSubmitting] = React.useState(false);
     const [submitted, setSubmitted] = React.useState(false);
 
     React.useEffect(() => {
@@ -32,16 +33,18 @@ window.pages.Register = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitting(true);
 
-        // Save application locally
-        window.applicationService.addApplication({
+        // Save application locally and to Google Form
+        await window.applicationService.addApplication({
             ...formData,
             jobId: jobId || 'General',
             jobTitle: jobDetails ? jobDetails.title : 'General Application'
         });
 
+        setSubmitting(false);
         setSubmitted(true);
         setTimeout(() => {
             navigate('/openings');
@@ -117,8 +120,12 @@ window.pages.Register = () => {
                         </div>
 
                         <div className="pt-4 border-t border-gray-100 flex items-center justify-end">
-                            <button type="submit" className="w-full sm:w-auto px-8 py-3.5 bg-accent hover:bg-blue-600 text-white font-medium rounded-md shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 inline-flex justify-center items-center">
-                                Submit Application <i className="fa-solid fa-paper-plane ml-2"></i>
+                            <button disabled={submitting} type="submit" className="w-full sm:w-auto px-8 py-3.5 bg-accent hover:bg-blue-600 text-white font-medium rounded-md shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 inline-flex justify-center items-center disabled:opacity-75 disabled:cursor-not-allowed">
+                                {submitting ? (
+                                    <><i className="fa-solid fa-spinner fa-spin mr-2"></i> Submitting...</>
+                                ) : (
+                                    <>Submit Application <i className="fa-solid fa-paper-plane ml-2"></i></>
+                                )}
                             </button>
                         </div>
                     </form>

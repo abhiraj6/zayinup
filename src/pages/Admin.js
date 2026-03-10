@@ -7,7 +7,7 @@ window.pages.Admin = () => {
     const [activeTab, setActiveTab] = React.useState("jobs");
 
     // Job form state
-    const [jobForm, setJobForm] = React.useState({ title: '', salary: '', location: '', jobType: 'Full-Time', experience: '', description: '' });
+    const [jobForm, setJobForm] = React.useState({ title: '', salary: '', location: '', jobType: 'Full-Time', experience: '', qualification: '', description: '' });
     const [jobs, setJobs] = React.useState([]);
 
     // College form state
@@ -38,7 +38,7 @@ window.pages.Admin = () => {
         e.preventDefault();
         const newJob = window.jobService.addJob(jobForm);
         setJobs(prev => [...prev, newJob]);
-        setJobForm({ title: '', salary: '', location: '', jobType: 'Full-Time', experience: '', description: '' });
+        setJobForm({ title: '', salary: '', location: '', jobType: 'Full-Time', experience: '', qualification: '', description: '' });
         alert("Job Added!");
     };
 
@@ -154,8 +154,9 @@ window.pages.Admin = () => {
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none" placeholder="Location" value={jobForm.location} onChange={e => setJobForm({ ...jobForm, location: e.target.value })} />
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none" placeholder="Salary Range" value={jobForm.salary} onChange={e => setJobForm({ ...jobForm, salary: e.target.value })} />
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none" placeholder="Experience Required" value={jobForm.experience} onChange={e => setJobForm({ ...jobForm, experience: e.target.value })} />
+                                        <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none md:col-span-2" placeholder="Qualification" value={jobForm.qualification} onChange={e => setJobForm({ ...jobForm, qualification: e.target.value })} />
 
-                                        <select className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none" value={jobForm.jobType} onChange={e => setJobForm({ ...jobForm, jobType: e.target.value })}>
+                                        <select className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none md:col-span-2" value={jobForm.jobType} onChange={e => setJobForm({ ...jobForm, jobType: e.target.value })}>
                                             <option>Full-Time</option>
                                             <option>Part-Time</option>
                                             <option>Contract</option>
@@ -184,7 +185,8 @@ window.pages.Admin = () => {
                                                 <div key={job.id} className="bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative group">
                                                     <div className="pr-10">
                                                         <h4 className="font-bold text-lg mb-1">{job.title}</h4>
-                                                        <p className="text-sm text-gray-600 mb-2"><i className="fa-solid fa-location-dot w-4"></i> {job.location}</p>
+                                                        <p className="text-sm text-gray-600 mb-1"><i className="fa-solid fa-location-dot w-4 text-primary"></i> {job.location}</p>
+                                                        <p className="text-sm text-gray-600 mb-2"><i className="fa-solid fa-graduation-cap w-4 text-primary"></i> {job.qualification}</p>
                                                         <div className="inline-flex bg-gray-100 text-xs px-2 py-1 rounded font-medium text-gray-700">{job.jobType}</div>
                                                     </div>
                                                     <button

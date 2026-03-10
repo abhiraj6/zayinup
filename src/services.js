@@ -6,6 +6,7 @@ window.initialJobs = [
         description: "Looking for an experienced React developer to build modern web applications. Must be proficient in hooks, context API, and Tailwind CSS.",
         location: "Remote",
         salary: "$80k - $120k",
+        qualification: "Bachelor's in Computer Science or equivalent",
         jobType: "Full-Time",
         experience: "3+ Years"
     },
@@ -15,6 +16,7 @@ window.initialJobs = [
         description: "Seeking an HR Executive to manage end-to-end recruitment cycle, onboarding, and employee relations.",
         location: "New York, NY / Hybrid",
         salary: "$60k - $80k",
+        qualification: "MBA in HR or related field",
         jobType: "Full-Time",
         experience: "1-3 Years"
     },
@@ -24,6 +26,7 @@ window.initialJobs = [
         description: "Join our backend team to build scalable microservices using Node.js, Express, and PostgreSQL.",
         location: "Remote",
         salary: "$90k - $130k",
+        qualification: "B.Tech/M.Tech in CS/IT",
         jobType: "Contract",
         experience: "4+ Years"
     }
@@ -135,6 +138,30 @@ window.applicationService = {
         const apps = window.applicationService.getApplications();
         apps.push({ ...app, id: Date.now(), date: new Date().toLocaleDateString() });
         localStorage.setItem('zayin_apps', JSON.stringify(apps));
+
+        const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdHXfDIt4aFYxCdADMIO9HZ5t79TdBnFEziqOdypPbEdzEUpQ/formResponse';
+
+        const now = new Date();
+        const params = new URLSearchParams();
+        params.append('entry.1816583469', app.jobTitle || 'General Application');
+        params.append('entry.1598123357', app.name || '');
+        params.append('entry.1353759820', app.phone || '');
+        params.append('entry.1163662141', app.email || '');
+        params.append('entry.1688199301', app.resumeLink || '');
+
+        // Date mapping
+        params.append('entry.1014585827_year', now.getFullYear().toString());
+        params.append('entry.1014585827_month', (now.getMonth() + 1).toString());
+        params.append('entry.1014585827_day', now.getDate().toString());
+
+        return fetch(formUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params
+        });
     }
 };
 

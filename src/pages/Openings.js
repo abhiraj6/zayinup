@@ -86,6 +86,11 @@ window.pages.Openings = () => {
                                         <div className="flex items-center text-sm text-gray-600">
                                             <i className="fa-solid fa-money-bill-wave w-5 text-gray-400"></i> {job.salary}
                                         </div>
+                                        {job.qualification && (
+                                            <div className="flex items-center text-sm text-gray-600">
+                                                <i className="fa-solid fa-graduation-cap w-5 text-gray-400"></i> {job.qualification}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
