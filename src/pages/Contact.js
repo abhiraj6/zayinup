@@ -10,6 +10,14 @@ window.pages.Contact = () => {
         message: ''
     });
 
+    const [domains, setDomains] = React.useState([]);
+    const [purposes, setPurposes] = React.useState([]);
+
+    React.useEffect(() => {
+        setDomains(window.optionsService.getDomains());
+        setPurposes(window.optionsService.getPurposes());
+    }, []);
+
     const [submitting, setSubmitting] = React.useState(false);
     const [submitted, setSubmitted] = React.useState(false);
 
@@ -130,8 +138,9 @@ window.pages.Contact = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">I am a...</label>
                                         <select required name="domain" value={formData.domain} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer appearance-none">
                                             <option value="" disabled>Select your domain</option>
-                                            <option value="Job seeker">Job seeker</option>
-                                            <option value="Company">Company</option>
+                                            {domains.map(d => (
+                                                <option key={d} value={d}>{d}</option>
+                                            ))}
                                         </select>
                                     </div>
 
@@ -140,9 +149,9 @@ window.pages.Contact = () => {
                                             <label className="block text-sm font-medium text-gray-700 mb-2">How can we help you?</label>
                                             <select required name="purpose" value={formData.purpose} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-indigo-50/50 border-indigo-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors cursor-pointer appearance-none">
                                                 <option value="" disabled>Select a purpose</option>
-                                                <option value="Job seeking">Job seeking</option>
-                                                <option value="Resume build">Resume building</option>
-                                                <option value="Both job and new resume">Both job and new resume</option>
+                                                {purposes.map(p => (
+                                                    <option key={p} value={p}>{p}</option>
+                                                ))}
                                             </select>
                                         </div>
                                     )}

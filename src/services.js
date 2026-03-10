@@ -95,6 +95,16 @@ window.jobService = {
         let jobs = window.jobService.getJobs();
         jobs = jobs.filter(j => String(j.id) !== String(id));
         localStorage.setItem('zayin_jobs', JSON.stringify(jobs));
+    },
+    updateJob: (updatedJob) => {
+        let jobs = window.jobService.getJobs();
+        const index = jobs.findIndex(j => String(j.id) === String(updatedJob.id));
+        if (index !== -1) {
+            jobs[index] = updatedJob;
+            localStorage.setItem('zayin_jobs', JSON.stringify(jobs));
+            return updatedJob;
+        }
+        return null;
     }
 };
 
@@ -126,6 +136,21 @@ window.collegeService = {
         let colleges = window.collegeService.getColleges();
         colleges = colleges.filter(c => String(c.id) !== String(id));
         localStorage.setItem('zayin_colleges', JSON.stringify(colleges));
+    },
+    updateCollege: (updatedCollege) => {
+        let colleges = window.collegeService.getColleges();
+        const index = colleges.findIndex(c => String(c.id) === String(updatedCollege.id));
+        if (index !== -1) {
+            const programsArray = typeof updatedCollege.programs === 'string'
+                ? updatedCollege.programs.split(',').map(p => p.trim())
+                : updatedCollege.programs;
+
+            const processedCollege = { ...updatedCollege, programs: programsArray };
+            colleges[index] = processedCollege;
+            localStorage.setItem('zayin_colleges', JSON.stringify(colleges));
+            return processedCollege;
+        }
+        return null;
     }
 };
 
@@ -162,6 +187,11 @@ window.applicationService = {
             },
             body: params
         });
+    },
+    deleteApplication: (id) => {
+        let apps = window.applicationService.getApplications();
+        apps = apps.filter(a => String(a.id) !== String(id));
+        localStorage.setItem('zayin_apps', JSON.stringify(apps));
     }
 };
 
@@ -197,5 +227,59 @@ window.contactService = {
             },
             body: params
         });
+    },
+    deleteContact: (id) => {
+        let contacts = window.contactService.getContacts();
+        contacts = contacts.filter(c => String(c.id) !== String(id));
+        localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
+    }
+};
+
+window.optionsService = {
+    getDomains: () => {
+        const domains = localStorage.getItem('zayin_domains');
+        if (!domains) {
+            const initial = ["Job seeker", "Company"];
+            localStorage.setItem('zayin_domains', JSON.stringify(initial));
+            return initial;
+        }
+        return JSON.parse(domains);
+    },
+    addDomain: (domain) => {
+        const domains = window.optionsService.getDomains();
+        if (!domains.includes(domain)) {
+            domains.push(domain);
+            localStorage.setItem('zayin_domains', JSON.stringify(domains));
+        }
+        return domains;
+    },
+    deleteDomain: (domain) => {
+        let domains = window.optionsService.getDomains();
+        domains = domains.filter(d => d !== domain);
+        localStorage.setItem('zayin_domains', JSON.stringify(domains));
+        return domains;
+    },
+    getPurposes: () => {
+        const purposes = localStorage.getItem('zayin_purposes');
+        if (!purposes) {
+            const initial = ["Job seeking", "Resume building", "Both job and new resume"];
+            localStorage.setItem('zayin_purposes', JSON.stringify(initial));
+            return initial;
+        }
+        return JSON.parse(purposes);
+    },
+    addPurpose: (purpose) => {
+        const purposes = window.optionsService.getPurposes();
+        if (!purposes.includes(purpose)) {
+            purposes.push(purpose);
+            localStorage.setItem('zayin_purposes', JSON.stringify(purposes));
+        }
+        return purposes;
+    },
+    deletePurpose: (purpose) => {
+        let purposes = window.optionsService.getPurposes();
+        purposes = purposes.filter(p => p !== purpose);
+        localStorage.setItem('zayin_purposes', JSON.stringify(purposes));
+        return purposes;
     }
 };

@@ -9,13 +9,21 @@ window.pages.Admin = () => {
     // Job form state
     const [jobForm, setJobForm] = React.useState({ title: '', salary: '', location: '', jobType: 'Full-Time', experience: '', qualification: '', description: '' });
     const [jobs, setJobs] = React.useState([]);
+    const [editingJobId, setEditingJobId] = React.useState(null);
 
     // College form state
     const [collegeForm, setCollegeForm] = React.useState({ name: '', location: '', programs: '', image: '', description: '', accreditation: '', intake: '' });
     const [colleges, setColleges] = React.useState([]);
+    const [editingCollegeId, setEditingCollegeId] = React.useState(null);
 
     const [apps, setApps] = React.useState([]);
     const [contacts, setContacts] = React.useState([]);
+
+    // Options Management
+    const [domains, setDomains] = React.useState([]);
+    const [purposes, setPurposes] = React.useState([]);
+    const [newDomain, setNewDomain] = React.useState("");
+    const [newPurpose, setNewPurpose] = React.useState("");
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -32,14 +40,42 @@ window.pages.Admin = () => {
         setColleges(window.collegeService.getColleges());
         setApps(window.applicationService.getApplications());
         setContacts(window.contactService.getContacts());
+        setDomains(window.optionsService.getDomains());
+        setPurposes(window.optionsService.getPurposes());
     };
 
     const handleJobSubmit = (e) => {
         e.preventDefault();
-        const newJob = window.jobService.addJob(jobForm);
-        setJobs(prev => [...prev, newJob]);
+        if (editingJobId) {
+            const updated = window.jobService.updateJob({ ...jobForm, id: editingJobId });
+            setJobs(prev => prev.map(j => String(j.id) === String(editingJobId) ? updated : j));
+            setEditingJobId(null);
+            alert("Job Updated!");
+        } else {
+            const newJob = window.jobService.addJob(jobForm);
+            setJobs(prev => [...prev, newJob]);
+            alert("Job Added!");
+        }
         setJobForm({ title: '', salary: '', location: '', jobType: 'Full-Time', experience: '', qualification: '', description: '' });
-        alert("Job Added!");
+    };
+
+    const startEditJob = (job) => {
+        setJobForm({
+            title: job.title || '',
+            salary: job.salary || '',
+            location: job.location || '',
+            jobType: job.jobType || 'Full-Time',
+            experience: job.experience || '',
+            qualification: job.qualification || '',
+            description: job.description || ''
+        });
+        setEditingJobId(job.id);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const cancelEditJob = () => {
+        setEditingJobId(null);
+        setJobForm({ title: '', salary: '', location: '', jobType: 'Full-Time', experience: '', qualification: '', description: '' });
     };
 
     const deleteJob = (id) => {
@@ -51,16 +87,86 @@ window.pages.Admin = () => {
 
     const handleCollegeSubmit = (e) => {
         e.preventDefault();
-        const newCollege = window.collegeService.addCollege(collegeForm);
-        setColleges(prev => [...prev, newCollege]);
+        if (editingCollegeId) {
+            const updated = window.collegeService.updateCollege({ ...collegeForm, id: editingCollegeId });
+            setColleges(prev => prev.map(c => String(c.id) === String(editingCollegeId) ? updated : c));
+            setEditingCollegeId(null);
+            alert("College Updated!");
+        } else {
+            const newCollege = window.collegeService.addCollege(collegeForm);
+            setColleges(prev => [...prev, newCollege]);
+            alert("College Added!");
+        }
         setCollegeForm({ name: '', location: '', programs: '', image: '', description: '', accreditation: '', intake: '' });
-        alert("College Added!");
+    };
+
+    const startEditCollege = (college) => {
+        setCollegeForm({
+            name: college.name || '',
+            location: college.location || '',
+            programs: Array.isArray(college.programs) ? college.programs.join(', ') : (college.programs || ''),
+            image: college.image || '',
+            description: college.description || '',
+            accreditation: college.accreditation || '',
+            intake: college.intake || ''
+        });
+        setEditingCollegeId(college.id);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const cancelEditCollege = () => {
+        setEditingCollegeId(null);
+        setCollegeForm({ name: '', location: '', programs: '', image: '', description: '', accreditation: '', intake: '' });
     };
 
     const deleteCollege = (id) => {
         if (window.confirm("Are you sure you want to delete this college?")) {
             window.collegeService.deleteCollege(id);
             setColleges(prev => prev.filter(c => String(c.id) !== String(id)));
+        }
+    };
+
+    const deleteApp = (id) => {
+        if (window.confirm("Are you sure you want to delete this application?")) {
+            window.applicationService.deleteApplication(id);
+            setApps(prev => prev.filter(a => String(a.id) !== String(id)));
+        }
+    };
+
+    const deleteContact = (id) => {
+        if (window.confirm("Are you sure you want to delete this contact request?")) {
+            window.contactService.deleteContact(id);
+            setContacts(prev => prev.filter(c => String(c.id) !== String(id)));
+        }
+    };
+
+    const handleAddDomain = (e) => {
+        e.preventDefault();
+        if (!newDomain.trim()) return;
+        const updated = window.optionsService.addDomain(newDomain.trim());
+        setDomains(updated);
+        setNewDomain("");
+    };
+
+    const handleDeleteDomain = (domain) => {
+        if (window.confirm(`Delete domain "${domain}"?`)) {
+            const updated = window.optionsService.deleteDomain(domain);
+            setDomains(updated);
+        }
+    };
+
+    const handleAddPurpose = (e) => {
+        e.preventDefault();
+        if (!newPurpose.trim()) return;
+        const updated = window.optionsService.addPurpose(newPurpose.trim());
+        setPurposes(updated);
+        setNewPurpose("");
+    };
+
+    const handleDeletePurpose = (purpose) => {
+        if (window.confirm(`Delete purpose "${purpose}"?`)) {
+            const updated = window.optionsService.deletePurpose(purpose);
+            setPurposes(updated);
         }
     };
 
@@ -105,6 +211,7 @@ window.pages.Admin = () => {
     const tabs = [
         { id: 'jobs', label: 'Manage Jobs', icon: 'fa-briefcase' },
         { id: 'colleges', label: 'Manage Colleges', icon: 'fa-building-columns' },
+        { id: 'options', label: 'Form Options', icon: 'fa-gears' },
         { id: 'apps', label: 'Applications', icon: 'fa-file-lines' },
         { id: 'contacts', label: 'Contact Requests', icon: 'fa-envelope-open-text' }
     ];
@@ -147,8 +254,11 @@ window.pages.Admin = () => {
                         {activeTab === 'jobs' && (
                             <div className="space-y-12 animate-in fade-in duration-300">
                                 {/* Add Job Form */}
-                                <div className="bg-blue-50/50 rounded-2xl p-6 md:p-8 border border-blue-100 shadow-sm">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center"><i className="fa-solid fa-circle-plus text-primary mr-2"></i> Add New Job</h3>
+                                <div className={`bg-blue-50/50 rounded-2xl p-6 md:p-8 border border-blue-100 shadow-sm transition-all ${editingJobId ? 'ring-2 ring-primary bg-blue-100/30' : ''}`}>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                        <i className={`fa-solid ${editingJobId ? 'fa-pen-to-square' : 'fa-circle-plus'} text-primary mr-2`}></i>
+                                        {editingJobId ? 'Update Job Posting' : 'Add New Job'}
+                                    </h3>
                                     <form onSubmit={handleJobSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none" placeholder="Job Title" value={jobForm.title} onChange={e => setJobForm({ ...jobForm, title: e.target.value })} />
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none" placeholder="Location" value={jobForm.location} onChange={e => setJobForm({ ...jobForm, location: e.target.value })} />
@@ -166,9 +276,14 @@ window.pages.Admin = () => {
                                             <textarea required rows="3" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-primary focus:border-primary outline-none resize-none" placeholder="Job Description" value={jobForm.description} onChange={e => setJobForm({ ...jobForm, description: e.target.value })}></textarea>
                                         </div>
 
-                                        <div className="md:col-span-2 flex justify-end">
+                                        <div className="md:col-span-2 flex justify-end gap-3">
+                                            {editingJobId && (
+                                                <button type="button" onClick={cancelEditJob} className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all">
+                                                    Cancel Edit
+                                                </button>
+                                            )}
                                             <button type="submit" className="px-6 py-2.5 bg-primary hover:bg-opacity-90 text-white font-medium rounded-lg shadow-sm transition-all flex items-center">
-                                                Publish Job <i className="fa-solid fa-paper-plane ml-2"></i>
+                                                {editingJobId ? 'Save Changes' : 'Publish Job'} <i className={`fa-solid ${editingJobId ? 'fa-check' : 'fa-paper-plane'} ml-2`}></i>
                                             </button>
                                         </div>
                                     </form>
@@ -182,12 +297,17 @@ window.pages.Admin = () => {
                                     ) : (
                                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                             {jobs.map(job => (
-                                                <div key={job.id} className="bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative group">
+                                                <div key={job.id} className={`bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative group ${editingJobId === job.id ? 'border-primary ring-1 ring-primary' : ''}`}>
                                                     <div className="pr-10">
                                                         <h4 className="font-bold text-lg mb-1">{job.title}</h4>
                                                         <p className="text-sm text-gray-600 mb-1"><i className="fa-solid fa-location-dot w-4 text-primary"></i> {job.location}</p>
                                                         <p className="text-sm text-gray-600 mb-2"><i className="fa-solid fa-graduation-cap w-4 text-primary"></i> {job.qualification}</p>
-                                                        <div className="inline-flex bg-gray-100 text-xs px-2 py-1 rounded font-medium text-gray-700">{job.jobType}</div>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <div className="inline-flex bg-gray-100 text-xs px-2 py-1 rounded font-medium text-gray-700">{job.jobType}</div>
+                                                            <button onClick={() => startEditJob(job)} className="text-xs text-primary hover:underline font-semibold flex items-center">
+                                                                <i className="fa-solid fa-pen mr-1"></i> Edit
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                     <button
                                                         onClick={() => deleteJob(job.id)}
@@ -204,11 +324,79 @@ window.pages.Admin = () => {
                             </div>
                         )}
 
+                        {activeTab === 'options' && (
+                            <div className="space-y-12 animate-in fade-in duration-300">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    {/* Domains Management */}
+                                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                            <i className="fa-solid fa-user-tag text-blue-600 mr-2"></i> Contact Domains
+                                        </h3>
+
+                                        <form onSubmit={handleAddDomain} className="flex gap-2 mb-6">
+                                            <input
+                                                className="flex-grow border border-gray-300 rounded-lg px-4 py-2 focus:ring-primary outline-none"
+                                                placeholder="e.g., Partner, Student"
+                                                value={newDomain}
+                                                onChange={e => setNewDomain(e.target.value)}
+                                            />
+                                            <button type="submit" className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90">
+                                                Add
+                                            </button>
+                                        </form>
+
+                                        <div className="space-y-2">
+                                            {domains.map(d => (
+                                                <div key={d} className="flex items-center justify-between bg-white px-4 py-2 rounded-lg border border-gray-100 group">
+                                                    <span className="text-gray-700">{d}</span>
+                                                    <button onClick={() => handleDeleteDomain(d)} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                        <i className="fa-solid fa-xmark"></i>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Purposes Management */}
+                                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                            <i className="fa-solid fa-bullseye text-green-600 mr-2"></i> Contact Purposes
+                                        </h3>
+
+                                        <form onSubmit={handleAddPurpose} className="flex gap-2 mb-6">
+                                            <input
+                                                className="flex-grow border border-gray-300 rounded-lg px-4 py-2 focus:ring-primary outline-none"
+                                                placeholder="e.g., Sponsorship, Career Guidance"
+                                                value={newPurpose}
+                                                onChange={e => setNewPurpose(e.target.value)}
+                                            />
+                                            <button type="submit" className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90">
+                                                Add
+                                            </button>
+                                        </form>
+
+                                        <div className="space-y-2">
+                                            {purposes.map(p => (
+                                                <div key={p} className="flex items-center justify-between bg-white px-4 py-2 rounded-lg border border-gray-100 group">
+                                                    <span className="text-gray-700">{p}</span>
+                                                    <button onClick={() => handleDeletePurpose(p)} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                        <i className="fa-solid fa-xmark"></i>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {activeTab === 'colleges' && (
                             <div className="space-y-12 animate-in fade-in duration-300">
                                 {/* Add College Form */}
-                                <div className="bg-purple-50/50 rounded-2xl p-6 md:p-8 border border-purple-100 shadow-sm">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center"><i className="fa-solid fa-building-columns text-purple-600 mr-2"></i> Add Affiliated College</h3>
+                                <div className={`bg-purple-50/50 rounded-2xl p-6 md:p-8 border border-purple-100 shadow-sm transition-all ${editingCollegeId ? 'ring-2 ring-purple-600 bg-purple-100/30' : ''}`}>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                        <i className={`fa-solid ${editingCollegeId ? 'fa-pen-to-square' : 'fa-building-columns'} text-purple-600 mr-2`}></i>
+                                        {editingCollegeId ? 'Update College Details' : 'Add Affiliated College'}
+                                    </h3>
                                     <form onSubmit={handleCollegeSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-purple-600 focus:border-purple-600 outline-none" placeholder="Institution Name" value={collegeForm.name} onChange={e => setCollegeForm({ ...collegeForm, name: e.target.value })} />
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-purple-600 focus:border-purple-600 outline-none" placeholder="Location (e.g., Paris, France)" value={collegeForm.location} onChange={e => setCollegeForm({ ...collegeForm, location: e.target.value })} />
@@ -226,9 +414,14 @@ window.pages.Admin = () => {
                                             <textarea required rows="3" className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-purple-600 focus:border-purple-600 outline-none resize-none" placeholder="Institution Description" value={collegeForm.description} onChange={e => setCollegeForm({ ...collegeForm, description: e.target.value })}></textarea>
                                         </div>
 
-                                        <div className="md:col-span-2 flex justify-end">
+                                        <div className="md:col-span-2 flex justify-end gap-3">
+                                            {editingCollegeId && (
+                                                <button type="button" onClick={cancelEditCollege} className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all">
+                                                    Cancel
+                                                </button>
+                                            )}
                                             <button type="submit" className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-sm transition-all flex items-center">
-                                                Add College <i className="fa-solid fa-paper-plane ml-2"></i>
+                                                {editingCollegeId ? 'Save Changes' : 'Add College'} <i className={`fa-solid ${editingCollegeId ? 'fa-check' : 'fa-paper-plane'} ml-2`}></i>
                                             </button>
                                         </div>
                                     </form>
@@ -242,14 +435,19 @@ window.pages.Admin = () => {
                                     ) : (
                                         <div className="grid gap-4 md:grid-cols-2">
                                             {colleges.map(college => (
-                                                <div key={college.id} className="bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative group flex">
+                                                <div key={college.id} className={`bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative group flex ${editingCollegeId === college.id ? 'border-purple-600 ring-1 ring-purple-600' : ''}`}>
                                                     <div className="w-1/3 min-h-full bg-gray-100 flex-shrink-0">
                                                         <img src={college.image} alt={college.name} className="w-full h-full object-cover" />
                                                     </div>
                                                     <div className="p-4 w-2/3 pr-10">
                                                         <h4 className="font-bold text-lg mb-1 leading-tight">{college.name}</h4>
                                                         <p className="text-sm text-gray-600 mb-2"><i className="fa-solid fa-location-dot w-4"></i> {college.location}</p>
-                                                        <div className="inline-flex bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded font-medium">{college.accreditation}</div>
+                                                        <div className="flex flex-wrap gap-2 items-center">
+                                                            <div className="inline-flex bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded font-medium">{college.accreditation}</div>
+                                                            <button onClick={() => startEditCollege(college)} className="text-xs text-purple-600 hover:underline font-semibold flex items-center">
+                                                                <i className="fa-solid fa-pen mr-1"></i> Edit
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                     <button
                                                         onClick={() => deleteCollege(college.id)}
@@ -283,7 +481,8 @@ window.pages.Admin = () => {
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position Applied</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Resume</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resume</th>
+                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
@@ -296,10 +495,15 @@ window.pages.Admin = () => {
                                                             <div>{app.email}</div>
                                                             <div className="text-xs">{app.phone}</div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                                        <td className="px-6 py-4 whitespace-nowrap text-left text-sm">
                                                             <a href={app.resumeLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1 bg-blue-50 text-accent rounded-full font-medium hover:bg-blue-100 transition-colors">
                                                                 View <i className="fa-solid fa-arrow-up-right-from-square ml-1.5 text-[10px]"></i>
                                                             </a>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                                            <button onClick={() => deleteApp(app.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete Application">
+                                                                <i className="fa-solid fa-trash-can"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -331,7 +535,10 @@ window.pages.Admin = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="md:w-2/3 md:pl-6 md:border-l flex flex-col justify-center">
+                                                <div className="md:w-2/3 md:pl-6 md:border-l flex flex-col justify-center relative">
+                                                    <button onClick={() => deleteContact(contact.id)} className="absolute top-0 right-0 text-gray-400 hover:text-red-500 transition-colors" title="Delete Request">
+                                                        <i className="fa-solid fa-trash-can"></i>
+                                                    </button>
                                                     <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Intent</p>
                                                     <div className="flex flex-col gap-2">
                                                         <span className="text-lg font-medium text-gray-900 bg-blue-50 inline-block px-3 py-1 rounded w-max">Domain: {contact.domain}</span>
