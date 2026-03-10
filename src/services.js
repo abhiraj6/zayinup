@@ -148,11 +148,23 @@ window.contactService = {
         contacts.push({ ...contact, id: Date.now(), date: new Date().toLocaleDateString() });
         localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
 
-        // Placeholder function accepts JSON data and sends to a mock endpoint. 
-        // In production, user will wire this to their Google Apps Script URL.
-        const googleSheetURL = "https://docs.google.com/spreadsheets/d/1lSPhknFf60Nv-N0Zd0rHgFulo8O1uHGHMvRunC4VgfE/edit";
+        // REPLACE THIS URL with your deployed Google Apps Script Web App URL
+        const googleSheetURL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
         console.log(`Sending Contact Info to mock processor for Sheet: ${googleSheetURL}`);
-        console.log("Data:", contact);
-        return new Promise((resolve) => setTimeout(resolve, 800)); // Simulate network request
+
+        if (googleSheetURL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+            console.warn("Contact form submitted successfully locally, but Google Sheets script URL is missing. Please add it to src/services.js");
+            return new Promise((resolve) => setTimeout(resolve, 800)); // Simulate network request for local testing
+        }
+
+        return fetch(googleSheetURL, {
+            method: 'POST',
+            mode: 'no-cors', // Important for Google Apps Script to bypass CORS blocked access
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(contact)
+        });
     }
 };
