@@ -33,6 +33,8 @@ window.syncService = {
             if (cloudData.colleges) localStorage.setItem('zayin_colleges', JSON.stringify(cloudData.colleges));
             if (cloudData.domains) localStorage.setItem('zayin_domains', JSON.stringify(cloudData.domains));
             if (cloudData.purposes) localStorage.setItem('zayin_purposes', JSON.stringify(cloudData.purposes));
+            if (cloudData.apps) localStorage.setItem('zayin_apps', JSON.stringify(cloudData.apps));
+            if (cloudData.contacts) localStorage.setItem('zayin_contacts', JSON.stringify(cloudData.contacts));
             if (callback) callback();
         }
     }
@@ -208,35 +210,13 @@ window.applicationService = {
         const apps = window.applicationService.getApplications();
         apps.push({ ...app, id: Date.now(), date: new Date().toLocaleDateString() });
         localStorage.setItem('zayin_apps', JSON.stringify(apps));
-
-        const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdHXfDIt4aFYxCdADMIO9HZ5t79TdBnFEziqOdypPbEdzEUpQ/formResponse';
-
-        const now = new Date();
-        const params = new URLSearchParams();
-        params.append('entry.1816583469', app.jobTitle || 'General Application');
-        params.append('entry.1598123357', app.name || '');
-        params.append('entry.1353759820', app.phone || '');
-        params.append('entry.535730515', app.email || '');
-        params.append('entry.1688199301', app.resumeLink || '');
-
-        // Date mapping
-        params.append('entry.1014585827_year', now.getFullYear().toString());
-        params.append('entry.1014585827_month', (now.getMonth() + 1).toString());
-        params.append('entry.1014585827_day', now.getDate().toString());
-
-        return fetch(formUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: params
-        });
+        return window.syncService.sync('Applications', apps);
     },
     deleteApplication: (id) => {
         let apps = window.applicationService.getApplications();
         apps = apps.filter(a => String(a.id) !== String(id));
         localStorage.setItem('zayin_apps', JSON.stringify(apps));
+        window.syncService.sync('Applications', apps);
     }
 };
 
@@ -249,34 +229,13 @@ window.contactService = {
         const contacts = window.contactService.getContacts();
         contacts.push({ ...contact, id: Date.now(), date: new Date().toLocaleDateString() });
         localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
-
-        const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSeq_MVcCTGrYWK01vYeALcadPU_HBxsnGjSW01UpJ_jlqjzlg/formResponse';
-
-        const params = new URLSearchParams();
-        params.append('entry.931431007', contact.name || '');
-        params.append('entry.1449185787', contact.email || '');
-        params.append('entry.404475525', contact.phone || '');
-        params.append('entry.605355254', contact.domain || '');
-        if (contact.purpose) {
-            params.append('entry.2037613741', contact.purpose);
-        }
-        if (contact.message) {
-            params.append('entry.1796405512', contact.message);
-        }
-
-        return fetch(formUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: params
-        });
+        return window.syncService.sync('ContactRequests', contacts);
     },
     deleteContact: (id) => {
         let contacts = window.contactService.getContacts();
         contacts = contacts.filter(c => String(c.id) !== String(id));
         localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
+        window.syncService.sync('ContactRequests', contacts);
     }
 };
 
