@@ -229,7 +229,26 @@ window.contactService = {
         const contacts = window.contactService.getContacts();
         contacts.push({ ...contact, id: Date.now(), date: new Date().toLocaleDateString() });
         localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
-        return window.syncService.sync('ContactRequests', contacts);
+        
+        // Sync to cloud
+        window.syncService.sync('ContactRequests', contacts);
+
+        // Submit to Google Form
+        const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSeq_MVcCTGrYWK01vYeALcadPU_HBxsnGjSW01UpJ_jlqjzlg/formResponse';
+        const params = new URLSearchParams();
+        params.append('entry.931431007', contact.name || '');
+        params.append('entry.1449185787', contact.email || '');
+        params.append('entry.404475525', contact.phone || '');
+        params.append('entry.605355254', contact.domain || '');
+        if (contact.purpose) params.append('entry.2037613741', contact.purpose);
+        if (contact.message) params.append('entry.1796405512', contact.message);
+
+        return fetch(formUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        });
     },
     deleteContact: (id) => {
         let contacts = window.contactService.getContacts();
