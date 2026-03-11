@@ -208,7 +208,7 @@ window.applicationService = {
     },
     addApplication: (app) => {
         const apps = window.applicationService.getApplications();
-        apps.push({ ...app, id: Date.now(), date: new Date().toLocaleDateString() });
+        apps.push({ ...app, id: Date.now(), date: new Date().toLocaleDateString(), status: 'Pending' });
         localStorage.setItem('zayin_apps', JSON.stringify(apps));
         return window.syncService.sync('Applications', apps);
     },
@@ -217,6 +217,17 @@ window.applicationService = {
         apps = apps.filter(a => String(a.id) !== String(id));
         localStorage.setItem('zayin_apps', JSON.stringify(apps));
         window.syncService.sync('Applications', apps);
+        return apps;
+    },
+    updateApplicationStatus: (id, newStatus) => {
+        let apps = window.applicationService.getApplications();
+        const index = apps.findIndex(a => String(a.id) === String(id));
+        if (index !== -1) {
+            apps[index].status = newStatus;
+            localStorage.setItem('zayin_apps', JSON.stringify(apps));
+            window.syncService.sync('Applications', apps);
+        }
+        return apps;
     }
 };
 
@@ -227,7 +238,7 @@ window.contactService = {
     },
     addContact: (contact) => {
         const contacts = window.contactService.getContacts();
-        contacts.push({ ...contact, id: Date.now(), date: new Date().toLocaleDateString() });
+        contacts.push({ ...contact, id: Date.now(), date: new Date().toLocaleDateString(), status: 'Pending' });
         localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
         
         // Sync to cloud
@@ -255,6 +266,17 @@ window.contactService = {
         contacts = contacts.filter(c => String(c.id) !== String(id));
         localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
         window.syncService.sync('ContactRequests', contacts);
+        return contacts;
+    },
+    updateContactStatus: (id, newStatus) => {
+        let contacts = window.contactService.getContacts();
+        const index = contacts.findIndex(c => String(c.id) === String(id));
+        if (index !== -1) {
+            contacts[index].status = newStatus;
+            localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
+            window.syncService.sync('ContactRequests', contacts);
+        }
+        return contacts;
     }
 };
 

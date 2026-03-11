@@ -140,6 +140,18 @@ window.pages.Admin = () => {
         }
     };
 
+    const toggleAppStatus = (id, currentStatus) => {
+        const newStatus = currentStatus === 'Pending' ? 'Noted' : 'Pending';
+        const updatedApps = window.applicationService.updateApplicationStatus(id, newStatus);
+        setApps([...updatedApps]);
+    };
+
+    const toggleContactStatus = (id, currentStatus) => {
+        const newStatus = currentStatus === 'Pending' ? 'Noted' : 'Pending';
+        const updatedContacts = window.contactService.updateContactStatus(id, newStatus);
+        setContacts([...updatedContacts]);
+    };
+
     const handleAddDomain = (e) => {
         e.preventDefault();
         if (!newDomain.trim()) return;
@@ -481,19 +493,25 @@ window.pages.Admin = () => {
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position Applied</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resume</th>
                                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
                                                 {apps.map(app => (
-                                                    <tr key={app.id} className="hover:bg-gray-50/50 transition-colors">
+                                                    <tr key={app.id} className={`hover:bg-gray-50/50 transition-colors ${app.status === 'Noted' ? 'bg-green-50/30' : ''}`}>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{app.date}</td>
                                                         <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{app.name}</td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-primary font-medium">{app.jobTitle}</td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                             <div>{app.email}</div>
                                                             <div className="text-xs">{app.phone}</div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                            <button onClick={() => toggleAppStatus(app.id, app.status || 'Pending')} className={`px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 transition-colors ${app.status === 'Noted' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'}`}>
+                                                                {app.status === 'Noted' ? <><i className="fa-solid fa-check"></i> Noted</> : <><i className="fa-regular fa-clock"></i> Pending</>}
+                                                            </button>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-left text-sm">
                                                             <a href={app.resumeLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1 bg-blue-50 text-accent rounded-full font-medium hover:bg-blue-100 transition-colors">
@@ -525,7 +543,7 @@ window.pages.Admin = () => {
                                 ) : (
                                     <div className="grid gap-6">
                                         {contacts.map(contact => (
-                                            <div key={contact.id} className="bg-white border rounded-xl p-6 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow border-l-4 border-l-primary">
+                                            <div key={contact.id} className={`bg-white border rounded-xl p-6 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow relative ${contact.status === 'Noted' ? 'border-l-4 border-l-green-500 bg-green-50/10' : 'border-l-4 border-l-primary'}`}>
                                                 <div className="md:w-1/3">
                                                     <h4 className="font-bold text-lg mb-1">{contact.name}</h4>
                                                     <p className="text-gray-500 text-sm mb-4"><i className="fa-regular fa-clock w-4"></i> {contact.date}</p>
@@ -536,14 +554,24 @@ window.pages.Admin = () => {
                                                 </div>
 
                                                 <div className="md:w-2/3 md:pl-6 md:border-l flex flex-col justify-center relative">
-                                                    <button onClick={() => deleteContact(contact.id)} className="absolute top-0 right-0 text-gray-400 hover:text-red-500 transition-colors" title="Delete Request">
-                                                        <i className="fa-solid fa-trash-can"></i>
-                                                    </button>
-                                                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Intent</p>
+                                                    <div className="absolute top-0 right-0 flex gap-2">
+                                                         <button onClick={() => toggleContactStatus(contact.id, contact.status || 'Pending')} className={`px-3 py-1 rounded-md text-xs font-bold inline-flex items-center gap-1.5 transition-colors ${contact.status === 'Noted' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'}`}>
+                                                            {contact.status === 'Noted' ? <><i className="fa-solid fa-check"></i> Noted</> : <><i className="fa-regular fa-clock"></i> Pending</>}
+                                                        </button>
+                                                        <button onClick={() => deleteContact(contact.id)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 w-8 h-8 rounded-full flex items-center justify-center transition-colors" title="Delete Request">
+                                                            <i className="fa-solid fa-trash-can"></i>
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2 mt-6 md:mt-0">Intent</p>
                                                     <div className="flex flex-col gap-2">
                                                         <span className="text-lg font-medium text-gray-900 bg-blue-50 inline-block px-3 py-1 rounded w-max">Domain: {contact.domain}</span>
                                                         {contact.purpose && <span className="text-primary font-medium bg-primary/5 inline-block px-3 py-1 rounded w-max">Purpose: {contact.purpose}</span>}
                                                     </div>
+                                                    {contact.message && (
+                                                        <div className="mt-4 p-4 bg-gray-50 rounded border text-sm text-gray-700 italic">
+                                                            "{contact.message}"
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
