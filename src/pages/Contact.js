@@ -48,7 +48,8 @@ window.pages.Contact = () => {
         }, 4000);
     };
 
-    const showPurpose = formData.domain === 'Job seeker';
+    const normalizedDomain = formData.domain ? formData.domain.toLowerCase().replace(/\s+/g, '') : '';
+    const showPurpose = normalizedDomain.includes('jobseeker');
 
     return (
         <div className="py-20 bg-gray-50 flex-grow relative overflow-hidden">
