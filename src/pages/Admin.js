@@ -16,6 +16,11 @@ window.pages.Admin = () => {
     const [colleges, setColleges] = React.useState([]);
     const [editingCollegeId, setEditingCollegeId] = React.useState(null);
 
+    // Employee form state
+    const [employeeForm, setEmployeeForm] = React.useState({ name: '', position: '', department: '', email: '', phone: '' });
+    const [employees, setEmployees] = React.useState([]);
+    const [editingEmployeeId, setEditingEmployeeId] = React.useState(null);
+
     const [apps, setApps] = React.useState([]);
     const [contacts, setContacts] = React.useState([]);
 
@@ -38,6 +43,7 @@ window.pages.Admin = () => {
     const loadData = () => {
         setJobs(window.jobService.getJobs());
         setColleges(window.collegeService.getColleges());
+        setEmployees(window.employeeService ? window.employeeService.getEmployees() : []);
         setApps(window.applicationService.getApplications());
         setContacts(window.contactService.getContacts());
         setDomains(window.optionsService.getDomains());
@@ -123,6 +129,45 @@ window.pages.Admin = () => {
         if (window.confirm("Are you sure you want to delete this college?")) {
             window.collegeService.deleteCollege(id);
             setColleges(prev => prev.filter(c => String(c.id) !== String(id)));
+        }
+    };
+
+    const handleEmployeeSubmit = (e) => {
+        e.preventDefault();
+        if (editingEmployeeId) {
+            const updated = window.employeeService.updateEmployee({ ...employeeForm, id: editingEmployeeId });
+            setEmployees(prev => prev.map(emp => String(emp.id) === String(editingEmployeeId) ? updated : emp));
+            setEditingEmployeeId(null);
+            alert("Employee Updated!");
+        } else {
+            const newEmployee = window.employeeService.addEmployee(employeeForm);
+            setEmployees(prev => [...prev, newEmployee]);
+            alert("Employee Added!");
+        }
+        setEmployeeForm({ name: '', position: '', department: '', email: '', phone: '' });
+    };
+
+    const startEditEmployee = (employee) => {
+        setEmployeeForm({
+            name: employee.name || '',
+            position: employee.position || '',
+            department: employee.department || '',
+            email: employee.email || '',
+            phone: employee.phone || ''
+        });
+        setEditingEmployeeId(employee.id);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const cancelEditEmployee = () => {
+        setEditingEmployeeId(null);
+        setEmployeeForm({ name: '', position: '', department: '', email: '', phone: '' });
+    };
+
+    const deleteEmployee = (id) => {
+        if (window.confirm("Are you sure you want to delete this employee?")) {
+            window.employeeService.deleteEmployee(id);
+            setEmployees(prev => prev.filter(e => String(e.id) !== String(id)));
         }
     };
 
@@ -223,6 +268,7 @@ window.pages.Admin = () => {
     const tabs = [
         { id: 'jobs', label: 'Manage Jobs', icon: 'fa-briefcase' },
         { id: 'colleges', label: 'Manage Colleges', icon: 'fa-building-columns' },
+        { id: 'employees', label: 'Manage Employees', icon: 'fa-users' },
         { id: 'options', label: 'Form Options', icon: 'fa-gears' },
         { id: 'apps', label: 'Applications', icon: 'fa-file-lines' },
         { id: 'contacts', label: 'Contact Requests', icon: 'fa-envelope-open-text' }
@@ -401,6 +447,70 @@ window.pages.Admin = () => {
                                 </div>
                             </div>
                         )}
+                        {activeTab === 'employees' && (
+                            <div className="space-y-12 animate-in fade-in duration-300">
+                                {/* Add Employee Form */}
+                                <div className={`bg-green-50/50 rounded-2xl p-6 md:p-8 border border-green-100 shadow-sm transition-all ${editingEmployeeId ? 'ring-2 ring-green-600 bg-green-100/30' : ''}`}>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                        <i className={`fa-solid ${editingEmployeeId ? 'fa-pen-to-square' : 'fa-user-plus'} text-green-600 mr-2`}></i>
+                                        {editingEmployeeId ? 'Update Employee Details' : 'Add New Employee'}
+                                    </h3>
+                                    <form onSubmit={handleEmployeeSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" placeholder="Full Name" value={employeeForm.name} onChange={e => setEmployeeForm({ ...employeeForm, name: e.target.value })} />
+                                        <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" placeholder="Position/Title" value={employeeForm.position} onChange={e => setEmployeeForm({ ...employeeForm, position: e.target.value })} />
+                                        <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" placeholder="Department" value={employeeForm.department} onChange={e => setEmployeeForm({ ...employeeForm, department: e.target.value })} />
+                                        <input required type="email" className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" placeholder="Email Address" value={employeeForm.email} onChange={e => setEmployeeForm({ ...employeeForm, email: e.target.value })} />
+                                        <input className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none md:col-span-2" placeholder="Phone Number" value={employeeForm.phone} onChange={e => setEmployeeForm({ ...employeeForm, phone: e.target.value })} />
+
+                                        <div className="md:col-span-2 flex justify-end gap-3">
+                                            {editingEmployeeId && (
+                                                <button type="button" onClick={cancelEditEmployee} className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all">
+                                                    Cancel
+                                                </button>
+                                            )}
+                                            <button type="submit" className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm transition-all flex items-center">
+                                                {editingEmployeeId ? 'Save Changes' : 'Add Employee'} <i className={`fa-solid ${editingEmployeeId ? 'fa-check' : 'fa-paper-plane'} ml-2`}></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                {/* Employee List */}
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Existing Employees ({employees.length})</h3>
+                                    {employees.length === 0 ? (
+                                        <p className="text-gray-500 italic">No employees listed yet.</p>
+                                    ) : (
+                                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                            {employees.map(employee => (
+                                                <div key={employee.id} className={`bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative group ${editingEmployeeId === employee.id ? 'border-green-600 ring-1 ring-green-600' : ''}`}>
+                                                    <div className="pr-10">
+                                                        <h4 className="font-bold text-lg mb-1">{employee.name}</h4>
+                                                        <p className="text-sm text-gray-800 font-medium mb-1">{employee.position}</p>
+                                                        <p className="text-sm text-gray-600 mb-1"><i className="fa-solid fa-building w-4 text-green-600"></i> {employee.department}</p>
+                                                        <p className="text-sm text-gray-600 mb-1"><i className="fa-solid fa-envelope w-4 text-green-600"></i> {employee.email}</p>
+                                                        {employee.phone && <p className="text-sm text-gray-600 mb-2"><i className="fa-solid fa-phone w-4 text-green-600"></i> {employee.phone}</p>}
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <button onClick={() => startEditEmployee(employee)} className="text-xs text-green-600 hover:underline font-semibold flex items-center">
+                                                                <i className="fa-solid fa-pen mr-1"></i> Edit
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => deleteEmployee(employee.id)}
+                                                        className="absolute top-4 right-4 w-8 h-8 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors shadow-sm bg-white border"
+                                                        title="Delete Employee"
+                                                    >
+                                                        <i className="fa-solid fa-trash-can"></i>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         {activeTab === 'colleges' && (
                             <div className="space-y-12 animate-in fade-in duration-300">
                                 {/* Add College Form */}

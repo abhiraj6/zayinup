@@ -332,3 +332,59 @@ window.optionsService = {
         return purposes;
     }
 };
+
+window.initialEmployees = [
+    {
+        id: 1,
+        name: "Alice Johnson",
+        position: "HR Manager",
+        department: "Human Resources",
+        email: "alice.j@zayinup.com",
+        phone: "+1 555 123 4567"
+    },
+    {
+        id: 2,
+        name: "Bob Smith",
+        position: "Senior Developer",
+        department: "Engineering",
+        email: "bob.s@zayinup.com",
+        phone: "+1 555 987 6543"
+    }
+];
+
+window.employeeService = {
+    getEmployees: () => {
+        const emps = localStorage.getItem('zayin_employees');
+        if (!emps) {
+            localStorage.setItem('zayin_employees', JSON.stringify(window.initialEmployees));
+            return window.initialEmployees;
+        }
+        return JSON.parse(emps);
+    },
+    addEmployee: (emp) => {
+        const emps = window.employeeService.getEmployees();
+        const newEmp = { ...emp, id: Date.now() };
+        emps.push(newEmp);
+        localStorage.setItem('zayin_employees', JSON.stringify(emps));
+        window.syncService.sync('Employees', emps);
+        return newEmp;
+    },
+    deleteEmployee: (id) => {
+        let emps = window.employeeService.getEmployees();
+        emps = emps.filter(e => String(e.id) !== String(id));
+        localStorage.setItem('zayin_employees', JSON.stringify(emps));
+        window.syncService.sync('Employees', emps);
+    },
+    updateEmployee: (updatedEmp) => {
+        let emps = window.employeeService.getEmployees();
+        const index = emps.findIndex(e => String(e.id) === String(updatedEmp.id));
+        if (index !== -1) {
+            emps[index] = updatedEmp;
+            localStorage.setItem('zayin_employees', JSON.stringify(emps));
+            window.syncService.sync('Employees', emps);
+            return updatedEmp;
+        }
+        return null;
+    }
+};
+
