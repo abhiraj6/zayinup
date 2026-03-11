@@ -335,18 +335,18 @@ window.optionsService = {
 
 window.initialEmployees = [
     {
-        id: 1,
+        id: "AD0001",
         name: "Alice Johnson",
         position: "HR Manager",
-        department: "Human Resources",
+        department: "Admin",
         email: "alice.j@zayinup.com",
         phone: "+1 555 123 4567"
     },
     {
-        id: 2,
+        id: "TC0001",
         name: "Bob Smith",
         position: "Senior Developer",
-        department: "Engineering",
+        department: "Telecaller",
         email: "bob.s@zayinup.com",
         phone: "+1 555 987 6543"
     }
@@ -363,7 +363,24 @@ window.employeeService = {
     },
     addEmployee: (emp) => {
         const emps = window.employeeService.getEmployees();
-        const newEmp = { ...emp, id: Date.now() };
+        let prefix = "GN";
+        if (emp.department === "Admin") prefix = "AD";
+        else if (emp.department === "Marketing") prefix = "MK";
+        else if (emp.department === "Database") prefix = "DB";
+        else if (emp.department === "Telecaller") prefix = "TC";
+
+        let maxNum = 0;
+        emps.forEach(e => {
+            if (e.id && typeof e.id === 'string' && e.id.startsWith(prefix)) {
+                const numPart = parseInt(e.id.substring(2)) || 0;
+                if (numPart > maxNum) maxNum = numPart;
+            }
+        });
+
+        const nextNum = maxNum + 1;
+        const newId = prefix + nextNum.toString().padStart(4, '0');
+
+        const newEmp = { ...emp, id: newId };
         emps.push(newEmp);
         localStorage.setItem('zayin_employees', JSON.stringify(emps));
         window.syncService.sync('Employees', emps);

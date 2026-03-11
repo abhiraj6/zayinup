@@ -17,7 +17,7 @@ window.pages.Admin = () => {
     const [editingCollegeId, setEditingCollegeId] = React.useState(null);
 
     // Employee form state
-    const [employeeForm, setEmployeeForm] = React.useState({ name: '', position: '', department: '', email: '', phone: '' });
+    const [employeeForm, setEmployeeForm] = React.useState({ name: '', position: '', department: 'Admin', email: '', phone: '' });
     const [employees, setEmployees] = React.useState([]);
     const [editingEmployeeId, setEditingEmployeeId] = React.useState(null);
 
@@ -144,7 +144,7 @@ window.pages.Admin = () => {
             setEmployees(prev => [...prev, newEmployee]);
             alert("Employee Added!");
         }
-        setEmployeeForm({ name: '', position: '', department: '', email: '', phone: '' });
+        setEmployeeForm({ name: '', position: '', department: 'Admin', email: '', phone: '' });
     };
 
     const startEditEmployee = (employee) => {
@@ -161,7 +161,7 @@ window.pages.Admin = () => {
 
     const cancelEditEmployee = () => {
         setEditingEmployeeId(null);
-        setEmployeeForm({ name: '', position: '', department: '', email: '', phone: '' });
+        setEmployeeForm({ name: '', position: '', department: 'Admin', email: '', phone: '' });
     };
 
     const deleteEmployee = (id) => {
@@ -458,7 +458,12 @@ window.pages.Admin = () => {
                                     <form onSubmit={handleEmployeeSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" placeholder="Full Name" value={employeeForm.name} onChange={e => setEmployeeForm({ ...employeeForm, name: e.target.value })} />
                                         <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" placeholder="Position/Title" value={employeeForm.position} onChange={e => setEmployeeForm({ ...employeeForm, position: e.target.value })} />
-                                        <input required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" placeholder="Department" value={employeeForm.department} onChange={e => setEmployeeForm({ ...employeeForm, department: e.target.value })} />
+                                        <select required className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" value={employeeForm.department} onChange={e => setEmployeeForm({ ...employeeForm, department: e.target.value })}>
+                                            <option value="Admin">Admin</option>
+                                            <option value="Marketing">Marketing</option>
+                                            <option value="Database">Database</option>
+                                            <option value="Telecaller">Telecaller</option>
+                                        </select>
                                         <input required type="email" className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none" placeholder="Email Address" value={employeeForm.email} onChange={e => setEmployeeForm({ ...employeeForm, email: e.target.value })} />
                                         <input className="border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-green-600 focus:border-green-600 outline-none md:col-span-2" placeholder="Phone Number" value={employeeForm.phone} onChange={e => setEmployeeForm({ ...employeeForm, phone: e.target.value })} />
 
@@ -485,7 +490,10 @@ window.pages.Admin = () => {
                                             {employees.map(employee => (
                                                 <div key={employee.id} className={`bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative group ${editingEmployeeId === employee.id ? 'border-green-600 ring-1 ring-green-600' : ''}`}>
                                                     <div className="pr-10">
-                                                        <h4 className="font-bold text-lg mb-1">{employee.name}</h4>
+                                                        <h4 className="font-bold text-lg mb-1 flex items-center gap-2">
+                                                            {employee.name}
+                                                            <span className="text-xs font-mono font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200">{employee.id}</span>
+                                                        </h4>
                                                         <p className="text-sm text-gray-800 font-medium mb-1">{employee.position}</p>
                                                         <p className="text-sm text-gray-600 mb-1"><i className="fa-solid fa-building w-4 text-green-600"></i> {employee.department}</p>
                                                         <p className="text-sm text-gray-600 mb-1"><i className="fa-solid fa-envelope w-4 text-green-600"></i> {employee.email}</p>
