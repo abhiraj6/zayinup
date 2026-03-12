@@ -35,6 +35,7 @@ window.syncService = {
             if (cloudData.purposes) localStorage.setItem('zayin_purposes', JSON.stringify(cloudData.purposes));
             if (cloudData.apps) localStorage.setItem('zayin_apps', JSON.stringify(cloudData.apps));
             if (cloudData.contacts) localStorage.setItem('zayin_contacts', JSON.stringify(cloudData.contacts));
+            if (cloudData.employees) localStorage.setItem('zayin_employees', JSON.stringify(cloudData.employees));
             if (callback) callback();
         }
     }
