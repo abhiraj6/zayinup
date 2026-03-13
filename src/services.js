@@ -1,5 +1,5 @@
 // We use window to share state and methods across Babel standalone scripts
-window.SYNC_URL = "https://script.google.com/macros/s/AKfycbxPRZ0yDw8ZVjmfmSpG32dlrYQJiKkLNET5Wy8ChhOvZhXqjgAtg1jdACNB3si3t3ir/exec";
+window.SYNC_URL = "https://script.google.com/macros/s/AKfycbxdgrU7rZLoO8fwx1z1XHKWl7dIiBYIwm0mD8ptbsBwbWi7DAyskCqphcmCpLOpKA8/exec";
 
 window.syncService = {
     sync: async (type, data) => {
