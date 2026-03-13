@@ -28,15 +28,48 @@ window.syncService = {
     },
     init: async (callback) => {
         const cloudData = await window.syncService.fetchAll();
+        
+        // Helper function to safely load array data
+        const safeLoad = (key, cloudArray, initialData) => {
+            const currentLocal = localStorage.getItem(key);
+            
+            // If cloud has data, it wins (but only if it's not empty, unless local is also empty)
+            if (cloudArray && cloudArray.length > 0) {
+                localStorage.setItem(key, JSON.stringify(cloudArray));
+            } 
+            // If cloud gives an empty array but we have no local state yet, use initial dummy data
+            else if (!currentLocal || JSON.parse(currentLocal).length === 0) {
+                if (initialData) {
+                    localStorage.setItem(key, JSON.stringify(initialData));
+                     // immediately sync local defaults back to cloud
+                    window.syncService.sync(key.replace('zayin_', '').charAt(0).toUpperCase() + key.replace('zayin_', '').slice(1), initialData);
+                }
+            }
+        };
+
         if (cloudData) {
-            if (cloudData.jobs) localStorage.setItem('zayin_jobs', JSON.stringify(cloudData.jobs));
-            if (cloudData.colleges) localStorage.setItem('zayin_colleges', JSON.stringify(cloudData.colleges));
-            if (cloudData.domains) localStorage.setItem('zayin_domains', JSON.stringify(cloudData.domains));
-            if (cloudData.purposes) localStorage.setItem('zayin_purposes', JSON.stringify(cloudData.purposes));
-            if (cloudData.apps) localStorage.setItem('zayin_apps', JSON.stringify(cloudData.apps));
-            if (cloudData.contacts) localStorage.setItem('zayin_contacts', JSON.stringify(cloudData.contacts));
-            if (cloudData.employees) localStorage.setItem('zayin_employees', JSON.stringify(cloudData.employees));
+            safeLoad('zayin_jobs', cloudData.jobs, window.initialJobs);
+            safeLoad('zayin_colleges', cloudData.colleges, window.initialColleges);
+            
+            const defaultDomains = ["Job seeker", "Company"];
+            safeLoad('zayin_domains', cloudData.domains, defaultDomains);
+            
+            const defaultPurposes = ["Job seeking", "Resume building", "Both job and new resume"];
+            safeLoad('zayin_purposes', cloudData.purposes, defaultPurposes);
+            
+            safeLoad('zayin_employees', cloudData.employees, window.initialEmployees);
+            
+            // Apps and contacts don't have initial dummy data
+            safeLoad('zayin_apps', cloudData.apps, []);
+            safeLoad('zayin_contacts', cloudData.contacts, []);
+            
             if (callback) callback();
+        } else {
+             // Fallback if cloud completely fails to fetch
+             if (!localStorage.getItem('zayin_jobs')) localStorage.setItem('zayin_jobs', JSON.stringify(window.initialJobs));
+             if (!localStorage.getItem('zayin_colleges')) localStorage.setItem('zayin_colleges', JSON.stringify(window.initialColleges));
+             if (!localStorage.getItem('zayin_employees')) localStorage.setItem('zayin_employees', JSON.stringify(window.initialEmployees));
+             if (callback) callback();
         }
     }
 };
