@@ -37,15 +37,19 @@ window.pages.Contact = () => {
         e.preventDefault();
         setSubmitting(true);
 
-        // Simulate API request to save to Google Sheets
-        await window.contactService.addContact(formData);
-
-        setSubmitting(false);
-        setSubmitted(true);
-        setTimeout(() => {
-            setSubmitted(false);
-            setFormData({ name: '', email: '', phone: '', domain: '', purpose: '', message: '' });
-        }, 4000);
+        try {
+            // Simulate API request to save to Google Sheets
+            await window.contactService.addContact(formData);
+        } catch (error) {
+            console.error("Error submitting form:", error);
+        } finally {
+            setSubmitting(false);
+            setSubmitted(true);
+            setTimeout(() => {
+                setSubmitted(false);
+                setFormData({ name: '', email: '', phone: '', domain: '', purpose: '', message: '' });
+            }, 4000);
+        }
     };
 
     const normalizedDomain = formData.domain ? formData.domain.toLowerCase().replace(/\s+/g, '') : '';

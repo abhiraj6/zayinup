@@ -270,15 +270,15 @@ window.contactService = {
         const contacts = localStorage.getItem('zayin_contacts');
         return contacts ? JSON.parse(contacts) : [];
     },
-    addContact: (contact) => {
+    addContact: async (contact) => {
         const contacts = window.contactService.getContacts();
         contacts.push({ ...contact, id: Date.now(), date: new Date().toLocaleDateString(), status: 'Pending' });
         localStorage.setItem('zayin_contacts', JSON.stringify(contacts));
         
         // Sync to cloud
-        window.syncService.sync('ContactRequests', contacts);
+        const syncPromise = window.syncService.sync('ContactRequests', contacts);
 
-        // Submit to Google Form
+        // Submit to Google Form (Backup)
         const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSeq_MVcCTGrYWK01vYeALcadPU_HBxsnGjSW01UpJ_jlqjzlg/formResponse';
         const params = new URLSearchParams();
         params.append('entry.931431007', contact.name || '');
@@ -288,12 +288,20 @@ window.contactService = {
         if (contact.purpose) params.append('entry.2037613741', contact.purpose);
         if (contact.message) params.append('entry.1796405512', contact.message);
 
-        return fetch(formUrl, {
+        const formPromise = fetch(formUrl, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: params
         });
+
+        // Wait for both silently, returning the updated contacts
+        try {
+            await Promise.allSettled([syncPromise, formPromise]);
+        } catch (e) {
+            console.error("Submission warnings:", e);
+        }
+        return contacts;
     },
     deleteContact: (id) => {
         let contacts = window.contactService.getContacts();
