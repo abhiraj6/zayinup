@@ -330,7 +330,12 @@ window.optionsService = {
             localStorage.setItem('zayin_domains', JSON.stringify(initial));
             return initial;
         }
-        return JSON.parse(domains);
+        let parsed = JSON.parse(domains);
+        // Map back to strings if they are objects from Google Sheets
+        if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null) {
+            parsed = parsed.map(d => d.name || d.Name || d[Object.keys(d)[0]]);
+        }
+        return parsed;
     },
     addDomain: (domain) => {
         const domains = window.optionsService.getDomains();
@@ -355,7 +360,12 @@ window.optionsService = {
             localStorage.setItem('zayin_purposes', JSON.stringify(initial));
             return initial;
         }
-        return JSON.parse(purposes);
+        let parsed = JSON.parse(purposes);
+        // Map back to strings if they are objects from Google Sheets
+        if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null) {
+            parsed = parsed.map(p => p.name || p.Name || p[Object.keys(p)[0]]);
+        }
+        return parsed;
     },
     addPurpose: (purpose) => {
         const purposes = window.optionsService.getPurposes();
