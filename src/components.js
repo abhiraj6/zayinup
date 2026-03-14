@@ -17,10 +17,10 @@ window.components.Navbar = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <nav className="bg-white shadow-md sticky top-0 z-50">
+        <nav className="bg-white shadow-md sticky top-0 z-[100] relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20 shadow-sm border-b border-gray-100">
-                    <div className="flex items-center">
+                    <div className="flex items-center z-50">
                         <Link to="/" className="flex-shrink-0 flex items-center gap-3">
                             <img
                                 src="https://raw.githubusercontent.com/abhiraj6/icon/refs/heads/main/Copy%20of%201771699124529.png"
@@ -32,29 +32,29 @@ window.components.Navbar = () => {
                     </div>
 
                     {/* Desktop Menu */}
-                    <div className="hidden md:ml-6 md:flex md:items-center space-x-8">
+                    <div className="hidden md:ml-6 md:flex md:items-center space-x-8 z-50">
                         {navLinks.map((link) => (
-                            <Link
+                            <a
                                 key={link.name}
-                                to={link.path}
-                                className={`text-sm font-medium px-1 py-2 transition-colors duration-200 border-b-2 ${isActive(link.path)
+                                href={`#${link.path}`}
+                                className={`text-sm font-medium px-1 py-2 transition-colors duration-200 border-b-2 cursor-pointer ${isActive(link.path)
                                     ? 'border-primary text-primary'
                                     : 'border-transparent text-gray-600 hover:text-primary hover:border-primary/50'
                                     }`}
                             >
                                 {link.name}
-                            </Link>
+                            </a>
                         ))}
-                        <Link
-                            to="/admin"
-                            className="ml-4 text-sm font-medium text-white bg-primary hover:bg-opacity-90 px-4 py-2 rounded-md shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+                        <a
+                            href="#/admin"
+                            className="ml-4 text-sm font-medium text-white bg-primary hover:bg-opacity-90 px-4 py-2 rounded-md shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
                         >
                             <i className="fa-solid fa-lock mr-2 text-xs"></i> Admin
-                        </Link>
+                        </a>
                     </div>
 
                     {/* Mobile menu button */}
-                    <div className="flex items-center md:hidden">
+                    <div className="flex items-center md:hidden z-50">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
@@ -70,9 +70,9 @@ window.components.Navbar = () => {
                 <div className="md:hidden bg-white border-b border-gray-200 shadow-inner">
                     <div className="pt-2 pb-3 space-y-1 sm:px-3">
                         {navLinks.map((link) => (
-                            <Link
+                            <a
                                 key={link.name}
-                                to={link.path}
+                                href={`#${link.path}`}
                                 onClick={() => setIsOpen(false)}
                                 className={`block px-4 py-3 text-base font-medium border-l-4 ${isActive(link.path)
                                     ? 'bg-primary/5 border-primary text-primary'
@@ -80,15 +80,15 @@ window.components.Navbar = () => {
                                     }`}
                             >
                                 {link.name}
-                            </Link>
+                            </a>
                         ))}
-                        <Link
-                            to="/admin"
+                        <a
+                            href="#/admin"
                             onClick={() => setIsOpen(false)}
                             className="block px-4 py-3 text-base font-medium text-accent hover:bg-gray-50"
                         >
                             <i className="fa-solid fa-lock mr-2 text-xs"></i> Admin Login
-                        </Link>
+                        </a>
                     </div>
                 </div>
             )}
@@ -168,7 +168,7 @@ window.components.Layout = ({ children }) => {
     return (
         <React.Fragment>
             <window.components.Navbar />
-            <main className="flex-grow w-full flex flex-col relative z-10 selection:bg-accent selection:text-white">
+            <main className="flex-grow w-full flex flex-col selection:bg-accent selection:text-white">
                 {children}
             </main>
             <window.components.Footer />
