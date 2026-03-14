@@ -9,21 +9,27 @@ window.pages.Openings = () => {
     const [searchTerm, setSearchTerm] = React.useState("");
 
     React.useEffect(() => {
-        // Simulate network delay for realism
-        setTimeout(() => {
-            const fetchedJobs = window.jobService.getJobs();
-            setJobs(fetchedJobs);
-            setLoading(false);
-        }, 600);
+        const fetchJobs = async () => {
+            try {
+                const fetchedJobs = await window.jobService.getJobs();
+                setJobs(fetchedJobs || []);
+            } catch (err) {
+                console.error("Failed to fetch jobs in Openings component:", err);
+                setJobs([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchJobs();
     }, []);
 
     const handleApply = (jobId) => {
         navigate(`/register?jobId=${jobId}`);
     };
 
-    const filteredJobs = jobs.filter(job =>
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredJobs = (jobs || []).filter(job =>
+        (job?.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job?.location || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
