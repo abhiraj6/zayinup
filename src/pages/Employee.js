@@ -1,12 +1,7 @@
 window.pages = window.pages || {};
 
 window.pages.Employee = () => {
-    const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-    const [employeeId, setEmployeeId] = React.useState("");
-    const [password, setPassword] = React.useState("");
-    const [error, setError] = React.useState("");
     const [activeTab, setActiveTab] = React.useState("jobs");
-    const [loggedInEmployee, setLoggedInEmployee] = React.useState(null);
 
     // Job form state
     const [jobForm, setJobForm] = React.useState({ title: '', salary: '', location: '', jobType: 'Full-Time', experience: '', qualification: '', description: '' });
@@ -16,25 +11,13 @@ window.pages.Employee = () => {
     const [apps, setApps] = React.useState([]);
     const [contacts, setContacts] = React.useState([]);
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        const employees = window.employeeService ? window.employeeService.getEmployees() : [];
-        const emp = employees.find(e => e.id === employeeId);
-        
-        if (emp && emp.phone === password) {
-            setIsAuthenticated(true);
-            setLoggedInEmployee(emp);
-            loadData();
-        } else {
-            setError("Incorrect Employee ID or Phone Number");
-        }
-    };
-
     const loadData = () => {
         setJobs(window.jobService.getJobs());
         setApps(window.applicationService.getApplications());
         setContacts(window.contactService.getContacts());
     };
+
+    React.useEffect(() => { loadData(); }, []);
 
     const handleJobSubmit = (e) => {
         e.preventDefault();
@@ -89,60 +72,6 @@ window.pages.Employee = () => {
         setContacts([...updatedContacts]);
     };
 
-    if (!isAuthenticated) {
-        return (
-            <div className="flex-grow flex items-center justify-center bg-gray-50 p-4 min-h-screen">
-                <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-                    <div className="text-center mb-8">
-                        <div className="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto text-3xl mb-4 shadow-inner ring-4 ring-blue-50">
-                            <i className="fa-solid fa-user-tie"></i>
-                        </div>
-                        <h2 className="text-3xl font-serif font-bold text-gray-900">Employee Portal</h2>
-                        <p className="text-gray-500 mt-2">Log in to your workspace</p>
-                    </div>
-
-                    <form onSubmit={handleLogin}>
-                        <div className="mb-4 relative">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Employee ID</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i className="fa-solid fa-id-badge text-gray-400"></i>
-                                </div>
-                                <input
-                                    type="text"
-                                    required
-                                    value={employeeId}
-                                    onChange={(e) => { setEmployeeId(e.target.value); setError(""); }}
-                                    className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
-                                    placeholder="Enter your Employee ID..."
-                                />
-                            </div>
-                        </div>
-                        <div className="mb-6 relative">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Password (Phone Number)</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i className="fa-solid fa-phone text-gray-400"></i>
-                                </div>
-                                <input
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                                    className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
-                                    placeholder="Enter your phone number..."
-                                />
-                            </div>
-                            {error && <p className="text-red-500 text-sm mt-2 flex items-center"><i className="fa-solid fa-circle-exclamation mr-1"></i> {error}</p>}
-                        </div>
-                        <button type="submit" className="w-full bg-primary hover:bg-opacity-90 text-white font-medium py-3 rounded-lg shadow-md transition-all flex justify-center items-center group">
-                            Access Dashboard <i className="fa-solid fa-arrow-right-to-bracket ml-2 transform group-hover:translate-x-1 transition-transform"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
-    }
 
     const tabs = [
         { id: 'jobs', label: 'Manage Jobs', icon: 'fa-briefcase' },
@@ -161,13 +90,7 @@ window.pages.Employee = () => {
                             <h1 className="text-3xl font-serif font-bold flex items-center gap-3">
                                 <i className="fa-solid fa-user-tie text-accent"></i> Employee Dashboard
                             </h1>
-                            <p className="text-blue-200 mt-2">Welcome back, {loggedInEmployee.name} ({loggedInEmployee.position})</p>
-                        </div>
-
-                        <div className="mt-6 md:mt-0">
-                            <button onClick={() => setIsAuthenticated(false)} className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-md text-sm font-medium backdrop-blur transition-all flex items-center shadow-sm">
-                                <i className="fa-solid fa-right-from-bracket mr-2"></i> Log Out
-                            </button>
+                            <p className="text-blue-200 mt-2">Manage job postings, applications, and contact requests</p>
                         </div>
                     </div>
 
