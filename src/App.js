@@ -11,6 +11,7 @@ const Register = window.pages.Register;
 const Contact = window.pages.Contact;
 const Admin = window.pages.Admin;
 const Admission = window.pages.Admission;
+const Employee = window.pages.Employee;
 
 const App = () => {
     const [isSyncing, setIsSyncing] = React.useState(!!window.SYNC_URL);
@@ -47,6 +48,7 @@ const App = () => {
 
                 {/* Admin Dashboard Page (Standalone without public layout features) */}
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/employee" element={<Employee />} />
             </Routes>
         </HashRouter>
     );

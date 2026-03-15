@@ -35,7 +35,16 @@ window.syncService = {
             
             // If cloud has data, it wins (but only if it's not empty, unless local is also empty)
             if (cloudArray && cloudArray.length > 0) {
-                localStorage.setItem(key, JSON.stringify(cloudArray));
+                // Normalize keys to lowercase to fix Google Sheets Header capitalization issues
+                const normalizedArray = cloudArray.map(obj => {
+                    if (typeof obj !== 'object' || obj === null) return obj;
+                    const newObj = {};
+                    for (let k in obj) {
+                        newObj[k.toLowerCase()] = obj[k];
+                    }
+                    return newObj;
+                });
+                localStorage.setItem(key, JSON.stringify(normalizedArray));
             } 
             // If cloud gives an empty array but we have no local state yet, use initial dummy data
             else if (!currentLocal || JSON.parse(currentLocal).length === 0) {
