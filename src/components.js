@@ -46,12 +46,6 @@ window.components.Navbar = () => {
                             </a>
                         ))}
                         <a
-                            href="#/employee"
-                            className="ml-4 text-sm font-medium text-primary bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-md shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
-                        >
-                            <i className="fa-solid fa-user-tie mr-2 text-xs"></i> Employee
-                        </a>
-                        <a
                             href="#/admin"
                             className="ml-4 text-sm font-medium text-white bg-primary hover:bg-opacity-90 px-4 py-2 rounded-md shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
                         >
@@ -88,13 +82,6 @@ window.components.Navbar = () => {
                                 {link.name}
                             </a>
                         ))}
-                        <a
-                            href="#/employee"
-                            onClick={() => setIsOpen(false)}
-                            className="block px-4 py-3 text-base font-medium text-primary hover:bg-gray-50"
-                        >
-                            <i className="fa-solid fa-user-tie mr-2 text-xs"></i> Employee Login
-                        </a>
                         <a
                             href="#/admin"
                             onClick={() => setIsOpen(false)}
