@@ -155,8 +155,10 @@ window.components.Footer = () => {
                         &copy; {new Date().getFullYear()} ZayinUp LLP. All rights reserved.
                     </p>
                     <div className="flex space-x-6 text-gray-400">
-                        <a href="#" className="hover:text-white transition-colors"><span className="sr-only">LinkedIn</span><i className="fa-brands fa-linkedin text-xl"></i></a>
-                        <a href="#" className="hover:text-white transition-colors"><span className="sr-only">Twitter</span><i className="fa-brands fa-twitter text-xl"></i></a>
+                        <a href="https://www.instagram.com/zayinupllp?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                            <span className="sr-only">Instagram</span>
+                            <i className="fa-brands fa-instagram text-xl"></i>
+                        </a>
                     </div>
                 </div>
             </div>
