@@ -159,6 +159,10 @@ window.components.Footer = () => {
                             <span className="sr-only">Instagram</span>
                             <i className="fa-brands fa-instagram text-xl"></i>
                         </a>
+                        <a href="https://chat.whatsapp.com/LDxWXNJHzVe3fBJ1adBsZO" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                            <span className="sr-only">WhatsApp</span>
+                            <i className="fa-brands fa-whatsapp text-xl"></i>
+                        </a>
                     </div>
                 </div>
             </div>
